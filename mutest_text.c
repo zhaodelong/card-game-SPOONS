@@ -26,12 +26,12 @@ int main(void){
 	int i;
 	void *status;
 
-	pthread_attr_t attr;
+	//pthread_attr_t attr;
 
 	pthread_mutex_init(&mutex_x, NULL);
 	
-	pthread_attr_init(&attr);
-	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+	//pthread_attr_init(&attr);
+	//pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
 	
 	
    	long t;
@@ -41,10 +41,10 @@ int main(void){
    	* The offset is specified by 'i'. The size of
    	* the data for each thread is indicated by VECLEN.
    	*/
-   	pthread_create(&threads[i], &attr, client, (void *)i); 
+   	pthread_create(&threads[i], NULL, client, (void *)i); 
    	}	
 
-	pthread_attr_destroy(&attr);
+	// pthread_attr_destroy(&attr);
 	/* Wait on the other threads */
 
 	for(i=0;i<NUM_THREADS;i++) {
