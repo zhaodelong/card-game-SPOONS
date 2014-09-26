@@ -47,24 +47,24 @@ void printarray (int arg[], int length) {
 void *client(void *threadid)
 {
 	int tid;
-	tid = (int)threadid;	
+	tid = (int)threadid;
+
+while (spoons >=0){
+		
 	pthread_mutex_lock(&mutex_x);
 
 	
 	if (tid == 0) {	
 		if (!b0Que.empty()){	
-			while (spoons >=0){	
-				if (spoons < 3 && spoons >0) {
+				
+				if (spoons < 3) {
 					printf("P%d win #: %d \n", tid, (4-spoons));
 					printf("P%d, final cards are:\n", tid);
+					fflush(stdout);
 					printarray(p0_cards,5);			
 					spoons--;
 					break;
-				} else if (spoons == 0){
-					printf("P%d lose \n", tid);
-					printf("P%d, final cards are:\n", tid);
-					printarray(p0_cards,5);
-					break;			
+							
 				} else if (spoons == 3){		
 					printf("P%d, old cards are:\n", tid);
 					printarray(p0_cards,5);
@@ -99,22 +99,19 @@ void *client(void *threadid)
 					}
 			
 				}
-			}
+			
 		}	
 	}else if (tid == 1) {
 		if (!b1Que.empty()){
-			while (spoons >=0){
-				if (spoons < 3 && spoons >0) {
+			
+				if (spoons < 3) {
 					printf("P%d win #: %d \n", tid, (4-spoons));
 					printf("P%d, final cards are:\n", tid);
+					fflush(stdout);
 					printarray(p1_cards,5);			
 					spoons--;
 					break;
-				} else if (spoons == 0){
-					printf("P%d lose \n", tid);
-					printf("P%d, final cards are:\n", tid);
-					printarray(p1_cards,5);
-					break;			
+							
 				} else if (spoons == 3){		
 					printf("P%d, old cards are:\n", tid);
 					printarray(p1_cards,5);
@@ -150,22 +147,19 @@ void *client(void *threadid)
 			
 				}
 		
-			}
+			
 		}
 	}else if (tid == 2) {
 		if (!b2Que.empty()){
-			while (spoons >=0){
-				if (spoons < 3 && spoons >0) {
+			
+				if (spoons < 3) {
 					printf("P%d win #: %d \n", tid, (4-spoons));
 					printf("P%d, final cards are:\n", tid);
+					fflush(stdout);
 					printarray(p2_cards,5);			
 					spoons--;
 					break;
-				} else if (spoons == 0){
-					printf("P%d lose \n", tid);
-					printf("P%d, final cards are:\n", tid);
-					printarray(p2_cards,5);
-					break;			
+						
 				} else  if (spoons == 3){		
 					printf("P%d, old cards are:\n", tid);
 					printarray(p2_cards,5);
@@ -201,22 +195,19 @@ void *client(void *threadid)
 			
 				}
 			
-			}
+			
 		}
 	}else if (tid == 3) {
 		if (!b3Que.empty()){
-			while (spoons >=0){
-				if (spoons < 3 && spoons >0) {
+			
+				if (spoons < 3 ) {
 					printf("P%d win #: %d \n", tid, (4-spoons));
 					printf("P%d, final cards are:\n", tid);
+					fflush(stdout);
 					printarray(p3_cards,5);			
 					spoons--;
 					break;
-				} else if (spoons == 0){
-					printf("P%d lose  \n", tid);
-					printf("P%d, final cards are:\n", tid);
-					printarray(p3_cards,5);
-					break;			
+							
 				} else  if (spoons == 3) {		
 					printf("P%d, old cards are:\n", tid);
 					printarray(p3_cards,5);
@@ -250,12 +241,20 @@ void *client(void *threadid)
 						break;			
 					}			
 				}
-			}
+			
 		}
 	}
-
 	pthread_mutex_unlock(&mutex_x);
+	cout << spoons << " tid:" << tid <<  endl;
 	
+	
+}
+
+
+if (spoons < 3){
+	pthread_mutex_unlock(&mutex_x);	
+	cout << "loser" << endl;
+}	
 	pthread_exit((void*) 0);
 		
 }
