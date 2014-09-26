@@ -10,8 +10,9 @@ using namespace std;
 int cards[52]; //52 cards
 int p0_cards[5], p1_cards[5], p2_cards[5], p3_cards[5];	// 5 cards per player.
 queue <int> b0Que, b1Que, b2Que, b3Que; // 4 buffers between each two players.
-pthread_t callThd[NUM_THREADS];
-pthread_mutex_t mutexsum;
+pthread_t threads[NUM_THREADS];
+pthread_mutex_t mutex_x;
+int spoons = 3;
 
 /* Shuffle cards function */
 void shuffle(int *array, size_t n)
@@ -31,34 +32,60 @@ void shuffle(int *array, size_t n)
 
 //print elements of a given array
 void printarray (int arg[], int length) {
-  for (int n=0; n<length; ++n)
-    cout << arg[n] << ' ';
-  cout << '\n';
+	for (int n=0; n<length; ++n)
+	{
+		cout << arg[n] << ' ';
+	}
+  	cout << '\n';
 }
 
-void *PrintHello(void *threadid)
+void *client(void *threadid)
 {
-   long tid;
-   tid = (long)threadid;
-   printf("Hello World! It's me, thread #%ld!\n", tid);
-   printarray(cards,52);
-   pthread_exit(NULL);
+	int tid;
+	tid = (int)threadid;
+	pthread_mutex_lock(&mutex_x);
+	printf("P%d, my cards are:\n", tid);
+	if (tid == 0) {
+		int i = 0;		
+		printarray(p0_cards,5);
+		cout << ""<< b0Que.front()<< endl;
+		cout << ""<< b1Que.front()<< endl;
+		
+	}else if (tid == 1) {
+		printarray(p1_cards,5);
+		cout << ""<< b1Que.front()<< endl;
+		cout << ""<< b2Que.front()<< endl;
+	}else if (tid == 2) {
+		printarray(p2_cards,5);
+		cout << ""<< b2Que.front()<< endl;
+		cout << ""<< b3Que.front()<< endl;
+	}else if (tid == 3) {
+		printarray(p3_cards,5);
+		cout << ""<< b3Que.front()<< endl;
+		cout << ""<< b0Que.front()<< endl;
+	}else {
+		cout << "thread out of 4" << endl;
+	}
+	pthread_mutex_unlock(&mutex_x);
+	pthread_exit((void*) 0);	
 }
 
 int main (int argc, char *argv[])
 {
 	
 	int i,j;
+	void *status;
+	pthread_mutex_init(&mutex_x, NULL);
 	for (i = 0; i < 52; i++)
 	{
 		cards[i] = i;
 	}
 
-	printarray(cards,52);
+	//printarray(cards,52);
 
 	//shuffle(cards, 52); // shuffle cards
 
-	printarray(cards,52);
+	//printarray(cards,52);
 
 	
 	for (j = 0; j < 5; j++ ) p0_cards[j] = cards[j];
@@ -66,10 +93,10 @@ int main (int argc, char *argv[])
 	for (j = 10; j < 15; j++ ) p2_cards[j-10] = cards[j];
 	for (j = 15; j < 20; j++ ) p3_cards[j-15] = cards[j];
 	
-	printarray(p0_cards,5);
-	printarray(p1_cards,5);
-	printarray(p2_cards,5);
-	printarray(p3_cards,5);	
+	//printarray(p0_cards,5);
+	//printarray(p1_cards,5);
+	//printarray(p2_cards,5);
+	//printarray(p3_cards,5);	
 	
 	//give 8 cards to buffer between each 2 players. 4 buffers total.
 	
@@ -90,21 +117,29 @@ int main (int argc, char *argv[])
 		b3Que.pop();
 	}
 	cout << b3Que.size() << endl;
-	*/	
-	pthread_t threads[NUM_THREADS];
-	int rc;
-	long t;
-	   for(t=0;t<NUM_THREADS;t++){
-	     printf("In main: creating thread %ld\n", t);
-	     rc = pthread_create(&threads[t], NULL, PrintHello, (void *)t);
-	     if (rc){
-	       printf("ERROR; return code from pthread_create() is %d\n", rc);
-	       exit(-1);
-	       }
-	     }
+	*/
 
-	   /* Last thing that main() should do */
-	   pthread_exit(NULL);
+	pthread_mutex_init(&mutex_x, NULL);
+	
+	
+	for(i=0;i<NUM_THREADS;i++)
+  	{
+  	/* Each thread works on a different set of data.
+   	* The offset is specified by 'i'. The size of
+   	* the data for each thread is indicated by VECLEN.
+   	*/
+   	pthread_create(&threads[i], NULL, client, (void *)i); 
+   	}	
+
+	// pthread_attr_destroy(&attr);
+	/* Wait on the other threads */
+
+	for(i=0;i<NUM_THREADS;i++) {
+  		pthread_join(threads[i], &status);
+  	}
+	/* After joining, print out the results and cleanup */
+	pthread_mutex_destroy(&mutex_x);
+	pthread_exit(NULL);
 
 
 }   
